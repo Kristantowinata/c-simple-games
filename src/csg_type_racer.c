@@ -52,53 +52,43 @@ csg_game_result csg_type_racer_start(void) {
     getch();
     clear();
 
-    int i = 0, j = 0;
+    int i = 0, j = 0,cekPrev = 1,cekNext = 1;
     int correct_chars = 0;
     const clock_t start_time = clock();
     set_cursor(i, j);
     bool ignore_space = false;
     while (i < count_word) {
-        set_cursor(0, 0);
-        print_words(count_word, words, type_state, i, j);
-        set_cursor(0, 0);
-        const char input = getch();
-        set_cursor(0, 0);
+        system("cls");
+        print_words(count_word, words, type_state,i,j);
+        char input = (char)getch();
 
-        if (input == KEY_BACKSPACE){
+        if (input == 8) { // Backspace
             if (j > 0) {
                 j--;
-                type_state[i][j] = NOT_TYPED;
-            } else if (i > 0) {
-                i--;
-                j = strlen(words[i]) - 1;
-                type_state[i][j] = NOT_TYPED;
-            }
-        } else if (input == ' '){
-            if(ignore_space) {
-                ignore_space = false;
-            }else {
-                for(int k = 0; k < strlen(words[i]); k++) {
-                    if(type_state[i][k] == 0) {
-                        type_state[i][k] = WRONG_TYPED;
-                    }
+                type_state[i][j] = 0;
+            }else if(j == 0 && cekPrev == 0){
+                if(i > 0){
+                    i--;
+                    j = strlen(words[i]) - 1;
+                    type_state[i][j] = 0;
                 }
-
-                i++;
+                cekPrev = 1;
+            }
+        } else if (input == ' ') {// Spasi
+            cekPrev = cekNext;
+            cekPrev = 0;
+            i++;
+            if (i < count_word) {
                 j = 0;
             }
-        } else {
-            if (input == words[i][j]){
-                type_state[i][j] = CORRECT_TYPED;
-                correct_chars++;
-            } else {
-                type_state[i][j] = WRONG_TYPED;
-            }
+        } else if (input == words[i][j]) { // Benar
+            type_state[i][j] = 1;
+            correct_chars++;
             j++;
-            if (j >= strlen(words[i])) {
-                i++;
-                ignore_space = true;
-                j = NOT_TYPED;
-            }
+        } else { // Salah
+            type_state[i][j] = 2;
+            cekNext = 0;
+            j++;
         }
     }
 
